@@ -1,0 +1,1021 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caesar Cipher | Lavender Cryptography</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --purple: #76518e;
+    --dark: #4c3265;
+    --lavender: #b99acb;
+    --soft: #eadcf0;
+    --white: #fffaff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    color: var(--dark);
+    background:
+        radial-gradient(circle at 15% 15%, #f3dff4, transparent 35%),
+        radial-gradient(circle at 85% 80%, #c8a5d8, transparent 40%),
+        linear-gradient(135deg, #d9bfe4, #a984c1, #e5cce9);
+    overflow-x: hidden;
+}
+.background-line {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .8;
+}
+
+.background-line path {
+    fill: none;
+    stroke: white;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    opacity: .75;
+}
+
+.container {
+    width: min(1100px, 92%);
+    margin: auto;
+    position: relative;
+    z-index: 1;
+}
+
+nav {
+    margin-top: 22px;
+    padding: 15px 28px;
+    border: 1px solid rgba(255,255,255,.6);
+    border-radius: 18px;
+    background: rgba(255,255,255,.25);
+    backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 5px 25px rgba(85,50,105,.08);
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    font-weight: 700;
+    color: #54366c;
+}
+
+.logo span {
+    margin-right: 8px;
+    color: #fff;
+    font-size: 25px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 25px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #654879;
+    font-size: 13px;
+    transition: .3s;
+}
+
+.nav-links a:hover {
+    color: white;
+}
+
+.hero {
+    text-align: center;
+    padding: 65px 10px 35px;
+}
+
+.hero .tag {
+    display: inline-block;
+    background: rgba(255,255,255,.35);
+    border: 1px solid rgba(255,255,255,.65);
+    padding: 7px 18px;
+    border-radius: 30px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #684b7b;
+    margin-bottom: 20px;
+}
+
+.hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 7vw, 75px);
+    color: #fffaff;
+    text-shadow: 0 4px 20px rgba(90,50,110,.15);
+}
+
+.hero h1 span {
+    color: #68477e;
+}
+
+.hero p {
+    font-size: 14px;
+    color: #624873;
+    margin-top: 12px;
+}
+
+.hero .line {
+    width: 180px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, white, transparent);
+    margin: 25px auto 0;
+}
+.panel {
+    background: rgba(255,255,255,.38);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 12px 40px rgba(78,48,95,.12);
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 23px;
+    color: #583b70;
+    margin-bottom: 20px;
+}
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.tab {
+    padding: 12px 28px;
+    border: 1px solid rgba(255,255,255,.8);
+    border-radius: 12px;
+    background: rgba(255,255,255,.35);
+    color: #624777;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.tab.active {
+    background: linear-gradient(120deg,#805a9b,#b18ac5);
+    color: white;
+    box-shadow: 0 5px 15px rgba(100,65,125,.2);
+}
+.input-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #634878;
+}
+
+textarea, input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.9);
+    outline: none;
+    background: rgba(255,255,255,.55);
+    color: #4e3760;
+    font-family: inherit;
+    font-size: 13px;
+    transition: .3s;
+}
+
+textarea {
+    min-height: 125px;
+    resize: vertical;
+}
+
+textarea::placeholder {
+    color: #9b80a8;
+}
+
+textarea:focus, input:focus {
+    border-color: #a77fc0;
+    box-shadow: 0 0 0 3px rgba(160,120,185,.13);
+}
+
+.hint {
+    font-size: 10px;
+    margin-top: 10px;
+    color: #80658f;
+}
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 13px;
+    margin-top: 25px;
+}
+
+button {
+    font-family: inherit;
+}
+
+.btn {
+    padding: 12px 28px;
+    min-width: 165px;
+    border-radius: 11px;
+    border: 1px solid white;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: .3s;
+}
+
+.btn-primary {
+    background: linear-gradient(120deg,#795391,#aa83bd);
+    color: white;
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,.45);
+    color: #654879;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(80,50,100,.17);
+}
+.result-panel {
+    margin-top: 22px;
+}
+
+.result-box {
+    background: rgba(255,255,255,.5);
+    border: 1px solid white;
+    border-radius: 13px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    min-height: 65px;
+}
+
+#output {
+    overflow-wrap: anywhere;
+    color: #624477;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.copy-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 9px;
+    background: #9470aa;
+    color: white;
+    cursor: pointer;
+}
+.calculation {
+    margin-top: 25px;
+    display: none;
+}
+
+.calculation.show {
+    display: block;
+}
+
+.calc-header {
+    margin-bottom: 17px;
+}
+
+.calc-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 23px;
+    color: #593b70;
+}
+
+.calc-header p {
+    font-size: 12px;
+    color: #80658f;
+    margin-top: 6px;
+}
+
+.calc-summary {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    padding: 15px;
+    background: rgba(255,255,255,.48);
+    border: 1px solid white;
+    border-radius: 12px;
+}
+
+.summary-item small {
+    display: block;
+    font-size: 10px;
+    color: #80658f;
+}
+
+.summary-item strong {
+    display: block;
+    margin-top: 5px;
+    color: #624477;
+    font-size: 17px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid white;
+    background: rgba(255,255,255,.4);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 620px;
+    font-size: 12px;
+    text-align: center;
+}
+
+th {
+    background: rgba(130,92,155,.75);
+    color: white;
+    padding: 13px 10px;
+    font-weight: 500;
+}
+
+td {
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.55);
+    color: #614775;
+}
+
+tbody tr:hover {
+    background: rgba(255,255,255,.4);
+}
+
+.letter {
+    font-weight: 700;
+    font-size: 15px;
+    color: #805a9c;
+}
+.math-info {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 20px;
+}
+
+.info-box {
+    padding: 23px;
+    border: 1px solid white;
+    background: rgba(255,255,255,.35);
+    border-radius: 17px;
+}
+
+.info-box h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #624477;
+    margin-bottom: 12px;
+}
+
+.info-box p {
+    font-size: 12px;
+    line-height: 1.9;
+    color: #765c87;
+}
+
+.formula {
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(255,255,255,.5);
+    border-radius: 9px;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: #684a7c;
+}
+
+.example {
+    margin-top: 14px;
+    padding: 12px;
+    border-left: 3px solid #a47cba;
+    background: rgba(255,255,255,.35);
+    border-radius: 5px;
+    font-size: 12px;
+    color: #765c87;
+    line-height: 1.9;
+}
+.alphabet {
+    margin-top: 22px;
+    padding: 22px;
+    background: rgba(255,255,255,.35);
+    border: 1px solid white;
+    border-radius: 17px;
+}
+
+.alphabet h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #624477;
+    margin-bottom: 15px;
+}
+
+.alphabet-grid {
+    display: grid;
+    grid-template-columns: repeat(13,1fr);
+    gap: 6px;
+}
+
+.alphabet-cell {
+    text-align: center;
+    background: rgba(255,255,255,.5);
+    padding: 8px 2px;
+    border-radius: 7px;
+    color: #67497a;
+    font-size: 11px;
+}
+
+.alphabet-cell strong {
+    display: block;
+    font-size: 13px;
+}
+
+.alphabet-cell small {
+    font-size: 9px;
+    opacity: .7;
+}
+footer {
+    padding: 35px 0;
+    text-align: center;
+    color: #654a78;
+    font-size: 12px;
+}
+
+footer span {
+    color: white;
+}
+
+@media(max-width:700px) {
+    .nav-links {
+        display: none;
+    }
+
+    .input-grid, .math-info {
+        grid-template-columns: 1fr;
+    }
+
+    .calc-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .alphabet-grid {
+        grid-template-columns: repeat(7,1fr);
+    }
+
+    .panel {
+        padding: 19px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .hero {
+        padding-top: 45px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<svg class="background-line" viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <path d="M-50 140 C100 290 180 70 330 170
+    C440 240 480 20 600 170
+    C720 330 750 100 860 180
+    C980 260 1080 130 1190 230
+    C1300 310 1380 170 1500 220"/>
+
+    <path d="M-80 650 C80 530 150 750 300 640
+    C420 550 500 780 620 660
+    C760 520 830 770 950 660
+    C1080 550 1170 750 1300 630
+    C1380 570 1450 670 1500 610"/>
+
+    <path d="M600 400 C550 310 700 280 720 400
+    C740 510 570 520 610 400
+    C650 300 790 330 760 450"/>
+</svg>
+
+<div class="container">
+
+<nav>
+    <div class="logo">
+        <span></span> Caesar Cipher
+    </div>
+
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#about">About</a>
+        <a href="#calculation">Calculation</a>
+        <a href="#formula">Theory</a>
+    </div>
+</nav>
+<header class="hero">
+
+    <div class="tag">MATHEMATICS • CRYPTOGRAPHY</div>
+
+    <h1>Caesar <span>Cipher</span></h1>
+
+    <p>
+        Enkripsi dan Dekripsi Pesan Menggunakan Aritmetika Modulo
+    </p>
+
+    <div class="line"></div>
+</header>
+<section class="panel">
+
+    <h2 class="section-title"> Encryption Workspace</h2>
+
+    <div class="tabs">
+
+        <button class="tab active" id="encryptTab"
+        onclick="setMode('encrypt')">
+             Enkripsi
+        </button>
+
+        <button class="tab" id="decryptTab"
+        onclick="setMode('decrypt')">
+            ↶ Dekripsi
+        </button>
+
+    </div>
+
+    <div class="input-grid">
+
+        <div>
+            <label for="message">Pesan Teks</label>
+
+            <textarea id="message"
+            placeholder="Masukkan pesan yang ingin dienkripsi..."></textarea>
+        </div>
+
+        <div>
+            <label for="shift">Nilai Pergeseran (Shift Key)</label>
+
+            <input type="number" id="shift"
+            min="0" max="25" value="3">
+
+            <p class="hint">
+                Masukkan angka 0 sampai 25 sebagai kunci pergeseran.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="actions">
+
+        <button class="btn btn-primary"
+        onclick="processCipher()" id="processButton">
+             Proses Enkripsi
+        </button>
+
+        <button class="btn btn-secondary"
+        onclick="resetAll()">
+            ↻ Reset
+        </button>
+
+    </div>
+
+</section>
+<section class="panel result-panel">
+
+    <h2 class="section-title"> Hasil Proses</h2>
+
+    <div class="result-box">
+
+        <div id="output">
+            Hasil akan muncul di sini...
+        </div>
+
+        <button class="copy-btn" onclick="copyResult()">
+            Salin
+        </button>
+
+    </div>
+
+</section>
+<section class="panel calculation" id="calculation">
+
+    <div class="calc-header">
+
+        <h2> Perhitungan Matematika Diskrit</h2>
+
+        <p>
+            Proses perhitungan setiap karakter berdasarkan
+            konsep aritmetika modulo 26.
+        </p>
+
+    </div>
+
+    <div class="calc-summary">
+
+        <div class="summary-item">
+            <small>Jenis Proses</small>
+            <strong id="calcType">Enkripsi</strong>
+        </div>
+
+        <div class="summary-item">
+            <small>Shift Key (k)</small>
+            <strong id="calcShift">3</strong>
+        </div>
+
+        <div class="summary-item">
+            <small>Total Huruf</small>
+            <strong id="calcCount">0</strong>
+        </div>
+
+    </div>
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Huruf Awal</th>
+                    <th>Nilai x</th>
+                    <th>Perhitungan Modulo</th>
+                    <th>Hasil Modulo</th>
+                    <th>Huruf Akhir</th>
+                </tr>
+            </thead>
+
+            <tbody id="calculationBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+<section class="math-info" id="about">
+
+    <div class="info-box">
+
+        <h3> Apa Itu Caesar Cipher?</h3>
+
+        <p>
+            Caesar Cipher merupakan metode kriptografi klasik
+            yang menggunakan teknik pergeseran huruf. Setiap
+            huruf pada pesan asli diubah menjadi huruf lain
+            berdasarkan nilai pergeseran tertentu.
+        </p>
+
+        <p style="margin-top:12px">
+            Dalam Matematika Diskrit, metode ini menggunakan
+            konsep himpunan alfabet, pemetaan fungsi, dan
+            aritmetika modulo untuk melakukan proses enkripsi
+            serta dekripsi pesan.
+        </p>
+
+    </div>
+
+    <div class="info-box" id="formula">
+
+        <h3> Rumus Matematika</h3>
+
+        <p>Rumus Enkripsi:</p>
+
+        <div class="formula">
+            E(x) = (x + k) mod 26
+        </div>
+
+        <p style="margin-top:12px">Rumus Dekripsi:</p>
+
+        <div class="formula">
+            D(x) = (x - k) mod 26
+        </div>
+
+        <div class="example">
+            x = posisi numerik huruf<br>
+            k = nilai pergeseran<br>
+            26 = jumlah huruf alfabet
+        </div>
+
+    </div>
+
+</section>
+<section class="alphabet">
+
+    <h3> Tabel Konversi Alfabet</h3>
+
+    <p style="font-size:11px;color:#80658f;margin-bottom:15px">
+        Setiap huruf memiliki nilai numerik dari 0 sampai 25.
+    </p>
+
+    <div class="alphabet-grid" id="alphabetGrid"></div>
+
+</section>
+
+<footer>
+    <span></span>
+    Proyek Matematika Diskrit
+    <span> | </span>
+    Program Studi Sistem Informasi
+    <span></span>
+</footer>
+
+</div>
+
+<script>
+
+let currentMode = "encrypt";
+let lastResult = "";
+
+function setMode(mode) {
+
+    currentMode = mode;
+
+    document.getElementById("encryptTab")
+    .classList.toggle("active", mode === "encrypt");
+
+    document.getElementById("decryptTab")
+    .classList.toggle("active", mode === "decrypt");
+
+    document.getElementById("processButton").textContent =
+    mode === "encrypt" ? " Proses Enkripsi" : " Proses Dekripsi";
+
+    document.getElementById("message").placeholder =
+    mode === "encrypt"
+    ? "Masukkan pesan yang ingin dienkripsi..."
+    : "Masukkan pesan yang ingin didekripsi...";
+
+    document.getElementById("output").textContent =
+    "Hasil akan muncul di sini...";
+
+    document.getElementById("calculation").classList.remove("show");
+    lastResult = "";
+}
+
+function caesarCipher(text, shift) {
+
+    let result = "";
+
+    for (let char of text) {
+
+        let code = char.charCodeAt(0);
+
+        if (code >= 65 && code <= 90) {
+
+            let x = code - 65;
+
+            let y = currentMode === "encrypt"
+            ? (x + shift) % 26
+            : ((x - shift) % 26 + 26) % 26;
+
+            result += String.fromCharCode(y + 65);
+
+        }
+
+        else if (code >= 97 && code <= 122) {
+
+            let x = code - 97;
+
+            let y = currentMode === "encrypt"
+            ? (x + shift) % 26
+            : ((x - shift) % 26 + 26) % 26;
+
+            result += String.fromCharCode(y + 97);
+
+        }
+
+        else {
+
+            result += char;
+
+        }
+
+    }
+
+    return result;
+}
+
+function processCipher() {
+
+    let message = document.getElementById("message").value;
+    let shiftValue = document.getElementById("shift").value;
+    let shift = Number(shiftValue);
+
+    if (message.trim() === "") {
+        alert("Masukkan pesan terlebih dahulu!");
+        return;
+    }
+
+    if (
+        shiftValue === "" ||
+        !Number.isInteger(shift) ||
+        shift < 0 || shift > 25
+    ) {
+        alert("Shift Key harus berupa bilangan bulat 0 sampai 25!");
+        return;
+    }
+
+    let result = caesarCipher(message, shift);
+
+    lastResult = result;
+
+    document.getElementById("output").textContent = result;
+
+    showCalculation(message, shift);
+
+}
+
+
+function showCalculation(message, shift) {
+
+    let body = document.getElementById("calculationBody");
+
+    body.innerHTML = "";
+
+    let no = 1;
+    let count = 0;
+
+    for (let char of message) {
+
+        let code = char.charCodeAt(0);
+
+        let valid =
+        (code >= 65 && code <= 90) ||
+        (code >= 97 && code <= 122);
+
+        if (!valid) continue;
+
+        let base = code >= 65 && code <= 90 ? 65 : 97;
+
+        let x = code - base;
+
+        let y;
+
+        let calculation;
+
+        if (currentMode === "encrypt") {
+
+            y = (x + shift) % 26;
+
+            calculation =
+            "(" + x + " + " + shift + ") mod 26 = " + y;
+
+        } else {
+
+            y = ((x - shift) % 26 + 26) % 26;
+
+            calculation =
+            "(" + x + " - " + shift + " + 26) mod 26 = " + y;
+
+        }
+
+        let newChar = String.fromCharCode(y + base);
+
+        let row = document.createElement("tr");
+
+        let values = [
+            no,
+            char,
+            x,
+            calculation,
+            y,
+            newChar
+        ];
+
+        values.forEach((value, index) => {
+
+            let cell = document.createElement("td");
+
+            cell.textContent = value;
+
+            if (index === 1 || index === 5) {
+                cell.className = "letter";
+            }
+
+            row.appendChild(cell);
+
+        });
+
+        body.appendChild(row);
+
+        no++;
+        count++;
+
+    }
+
+    document.getElementById("calcType").textContent =
+    currentMode === "encrypt" ? "Enkripsi" : "Dekripsi";
+
+    document.getElementById("calcShift").textContent = shift;
+
+    document.getElementById("calcCount").textContent = count;
+
+    document.getElementById("calculation").classList.add("show");
+
+}
+
+async function copyResult() {
+
+    if (lastResult === "") {
+        alert("Belum ada hasil untuk disalin!");
+        return;
+    }
+
+    try {
+
+        await navigator.clipboard.writeText(lastResult);
+
+        alert("Hasil berhasil disalin!");
+
+    } catch (error) {
+
+        alert("Tidak dapat menyalin hasil.");
+
+    }
+
+}
+
+function resetAll() {
+
+    document.getElementById("message").value = "";
+
+    document.getElementById("shift").value = 3;
+
+    document.getElementById("output").textContent =
+    "Hasil akan muncul di sini...";
+
+    document.getElementById("calculation").classList.remove("show");
+
+    document.getElementById("calculationBody").innerHTML = "";
+
+    lastResult = "";
+
+    setMode("encrypt");
+
+}
+
+function createAlphabet() {
+
+    let grid = document.getElementById("alphabetGrid");
+
+    for (let i = 0; i < 26; i++) {
+
+        let cell = document.createElement("div");
+
+        cell.className = "alphabet-cell";
+
+        cell.innerHTML =
+        "<strong>" + String.fromCharCode(65 + i) +
+        "</strong><small>" + i + "</small>";
+
+        grid.appendChild(cell);
+
+    }
+
+}
+
+createAlphabet();
+
+</script>
+
+</body>
+</html>
